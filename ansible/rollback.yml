@@ -1,0 +1,8 @@
+- name: Rollback the FastAPI application
+  hosts: localhost
+  tasks:
+    - name: Stop and remove the current container
+      ansible.builtin.command: docker rm -f fastapi-container
+
+    - name: Start the previous version of the container
+      ansible.builtin.command: docker run -d --name fastapi-container -p 8000:80 fastapi-app:previous

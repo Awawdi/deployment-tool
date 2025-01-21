@@ -1,0 +1,8 @@
+- name: Update the FastAPI app
+  hosts: localhost
+  tasks:
+    - name: Stop and remove existing container
+      ansible.builtin.command: docker rm -f fastapi-app
+
+    - name: Rebuild Docker image
+      ansible.builtin.command: docker build -t fast
