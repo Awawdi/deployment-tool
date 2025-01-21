@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fastapi-app"
+version = "0.1.0"
+description = "A FastAPI application"
+authors = [
+    { name = "Orsan Awawdi", email = "orsan.awawdi@gmail.com" }
+]
+requires-python = ">=3.9"

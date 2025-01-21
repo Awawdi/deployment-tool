@@ -1,8 +1,12 @@
 - name: Update the FastAPI app
   hosts: localhost
   tasks:
-    - name: Stop and remove existing container
+    - name: Stop and remove the current container if running
       ansible.builtin.command: docker rm -f fastapi-app
+      ignore_errors: yes
 
-    - name: Rebuild Docker image
-      ansible.builtin.command: docker build -t fast
+    - name: Pull the "latest" Docker image
+      ansible.builtin.command: docker pull orsanaw/fastapi-app:latest
+
+    - name: Start the FastAPI container with the "latest" image
+      ansible.builtin.command: docker run -d --name fastapi-app -p 8000:8000 fastapi-app:latest

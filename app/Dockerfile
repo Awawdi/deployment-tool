@@ -1,17 +1,19 @@
-FROM python:3.9
-
-# Set the working directory
+ARG PYTHON_VERSION=3.9-alpine
+FROM python:${PYTHON_VERSION} AS builder
+LABEL stage=builder
 WORKDIR /app
+COPY pyproject.toml requirements.txt /app/
 
-# Copy requirements and install dependencies
-COPY ./requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir wheel
+RUN pip wheel --no-cache-dir -r requirements.txt -w /wheels
 
-# Copy the application code
-COPY . .
+FROM python:${PYTHON_VERSION} AS runner
+LABEL stage=runner
 
-# Expose the default FastAPI port
+WORKDIR /app
+COPY --from=builder /wheels /wheels
+RUN pip install --no-cache-dir /wheels/* && rm -rf /wheels
+COPY app.py /app/
 EXPOSE 8000
-
-# Run the FastAPI application
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["uvicorn", "app:app"]
+CMD ["--host", "0.0.0.0", "--port", "8000"]

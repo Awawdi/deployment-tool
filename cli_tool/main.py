@@ -1,6 +1,5 @@
 import argparse
-import os
-from cli_tool.ansible_runner import AnsibleRunner
+from cli_tool.operations import DeployOperation, UpdateOperation, RollbackOperation
 
 
 class DeploymentCLI:
@@ -19,18 +18,27 @@ class DeploymentCLI:
         self.parser.add_argument("--log", type=str, help="Path to the log file.")
         self.parser.add_argument("--secret", type=str, help="Secret key or token.")
 
+    def get_operation(self, args):
+        """Determine the operation based on CLI arguments."""
+        if args.deploy:
+            return DeployOperation(verbose=args.verbose)
+        elif args.update:
+            return UpdateOperation(verbose=args.verbose)
+        elif args.rollback:
+            return RollbackOperation(verbose=args.verbose)
+        else:
+            raise ValueError("Please specify an operation: --deploy, --update, or --rollback")
+
+
     def run(self):
         args = self.parser.parse_args()
-        runner = AnsibleRunner(verbose=args.verbose)
-
-        if args.deploy:
-            runner.run_playbook("ansible/deploy.yml", args.env, args.secret)
-        elif args.update:
-            runner.run_playbook("ansible/update.yml", args.env, args.secret)
-        elif args.rollback:
-            runner.run_playbook("ansible/rollback.yml", args.env, args.secret)
-        else:
-            print("Please specify an operation: --deploy, --update, or --rollback")
+        try:
+            operation = self.get_operation(args)
+            operation.execute(config_path=args.config, env=args.env, secret=args.secret)
+        except ValueError as e:
+            print(e)
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
 
 
 if __name__ == "__main__":

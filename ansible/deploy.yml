@@ -1,10 +1,14 @@
 - name: Deploy the FastAPI app
   hosts: localhost
   tasks:
+    - name: Stop and remove any existing container if running
+      ansible.builtin.command: docker rm -f fastapi-app
+      ignore_errors: yes
+
     - name: Pull Docker image
       ansible.builtin.command:
-        cmd: docker build -t fastapi-app:latest -f Dockerfile .
+        cmd: docker build -t fastapi-app:base -f Dockerfile .
         chdir: /home/orsan/PycharmProjects/cli-agent/app
 
     - name: Start the FastAPI container
-      ansible.builtin.command: docker run -d --name fastapi-app -p 8000:8000 fastapi-app
+      ansible.builtin.command: docker run -d --name fastapi-app -p 8000:8000 fastapi-app:base
