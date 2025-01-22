@@ -3,12 +3,18 @@ import subprocess
 import logging
 
 class DeploymentOperation(ABC):
+    """
+    Abstract class for deployment operations.
+    """
     def __init__(self, verbose=False):
         self.verbose = verbose
         self.logger = logging.getLogger()
 
     @abstractmethod
     def execute(self, config_path, env, secret):
+        """
+        Each operation will implement the execute method differently.
+        """
         pass
 
     def run_command(self, command):

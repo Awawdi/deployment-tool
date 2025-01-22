@@ -2,8 +2,8 @@ import logging
 
 def setup_logging(verbose=False, log_file="app.log"):
     """
-    Sets up logging to both a file and the console.
-    :param verbose: Enable verbose (DEBUG) output if True.
+    Setup logging to both a file and the console.
+    :param verbose: Enable verbose (DEBUG) output if present (present=True).
     :param log_file: The file where logs will be written.
     """
 

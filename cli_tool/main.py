@@ -6,10 +6,13 @@ from cli_tool.vault_cloud_api import VaultAPI
 
 
 class DeploymentCLI:
-
-    ORGANIZATION_ID = "org-12345"
-    PROJECT_ID = "proj-67890"
-    APP_NAME = "your-app-name"
+    """
+    Command-line interface for deployment operations.
+    """
+    HCP_CLIENT_ID = "cTpBXF0Bq52Mn1K5FWL9bY3cHrHDKk9P"
+    ORGANIZATION_ID = "7e48578e-e4a2-443d-9cad-d61f13e0ad87"
+    PROJECT_ID = "c15a31a9-fc11-4532-bf85-82a98804f390"
+    APP_NAME = "fastapi-app"
 
     def __init__(self):
         self.logger = logging.getLogger()
@@ -28,6 +31,9 @@ class DeploymentCLI:
         self.parser.add_argument("--secret", type=str, help="Secret key or token.")
 
     def get_operation(self, args):
+        """
+        Factory method to create the correct operation based on the CLI arguments.
+        """
         if args.deploy:
             return DeployOperation()
         elif args.update:
@@ -37,28 +43,40 @@ class DeploymentCLI:
         else:
             raise ValueError("Please specify an operation: --deploy, --update, or --rollback")
 
-    def validate_mandatory_flags(self, args):
+    @staticmethod
+    def validate_mandatory_flags(args)->None:
         if not (args.deploy or args.update or args.rollback):
             raise ValueError("You must specify at least one of --deploy, --update, or --rollback.")
 
-    def retrieve_secrets(secret_key:str):
+    def retrieve_secret(self,secret_key:str):
         try:
-            vault_api = VaultAPI()
-            secrets = vault_api.retrieve_secrets(secret_key=secret_key)
-            return secrets
+            hcp_api_token = VaultAPI.get_instance().get_hcp_api_token(self.HCP_CLIENT_ID, secret_key)
+            secret = VaultAPI.get_instance().fetch_secrets(hcp_api_token, self.ORGANIZATION_ID, self.PROJECT_ID, self.APP_NAME)
+            username, password = self.get_credentials(data=secret)
+            return password
         except Exception as ex:
-            raise Exception(f"Error retrieving secrets: [{ex}]")
+            raise Exception(f"Error retrieving secrets: [{ex}]. Client ID: {self.HCP_CLIENT_ID}")
 
+    @staticmethod
+    def get_credentials(data:dict,username_key="MONGODB_USERNAME",password_key="MONGODB_PASS"):
+        credentials = {'username': None, 'password': None}
+
+        for secret in data.get('secrets', []):
+            if secret.get('name') == username_key:
+                credentials['username'] = secret.get('static_version', {}).get('value')
+            elif secret.get('name') == password_key:
+                credentials['password'] = secret.get('static_version', {}).get('value')
+
+        return credentials
 
     def run(self):
         try:
             args = self.parser.parse_args()
             setup_logging(log_file=args.log,verbose=args.verbose)
             self.validate_mandatory_flags(args)
-
-            secrets = self.retrieve_secrets(secret_key=args.secret)
+            secret = self.retrieve_secret(secret_key=args.secret) if args.secret else None
             operation = self.get_operation(args)
-            operation.execute(config_path=args.config, env=args.env, secret=args.secret)
+            operation.execute(config_path=args.config, env=args.env, secret=secret)
         except ValueError as ex:
             self.logger.error(f"Validation error: [{ex}]")
             print(f"Validation error: [{ex}]")
