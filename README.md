@@ -101,6 +101,7 @@ python -m cli_tool.main --rollback --config ansible/rollback.yml --env <environm
 ├── app/                    # FastAPI application source code
 │   ├── main.py             # FastAPI entry point
 │   └── Dockerfile          # Dockerfile to containerize the app
+│   └── requirements        # Project Dependencies
 ├── ansible/                # Ansible playbooks
 │   ├── deploy.yml          # Playbook to deploy the BASE image
 │   ├── update.yml          # Playbook to deploy the LATEST image
@@ -110,7 +111,6 @@ python -m cli_tool.main --rollback --config ansible/rollback.yml --env <environm
 │   ├── operations.py       # Handles deploy, update, and rollback operations
 │   ├── vault_cloud_api.py  # Interacts with Vault API for secrets management
 │   └── logging_config.py   # Logging configuration module
-├── requirements.txt        # Python dependencies
 ├── README.md               # Project documentation
 └── .venv/                  # Virtual environment (ignored in `.gitignore`)
 ```
