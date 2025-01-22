@@ -3,7 +3,7 @@
 ## Setup
 1. Clone the repository.
 2. Create a virtual environment and install dependencies.
-3. Add your secret key in `.env`.
+3. [optional] Add your secret key in `.env`.
 4. Run the CLI tool using `python cli_tool/main.py`.
 
 ## Commands

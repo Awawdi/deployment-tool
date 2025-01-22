@@ -1,50 +1,45 @@
 from abc import ABC, abstractmethod
 import subprocess
+import logging
 
 class DeploymentOperation(ABC):
-    """Abstract base class for deployment operations."""
-
     def __init__(self, verbose=False):
         self.verbose = verbose
+        self.logger = logging.getLogger()
 
     @abstractmethod
     def execute(self, config_path, env, secret):
         pass
 
     def run_command(self, command):
-        """Run a shell command."""
         try:
             if self.verbose:
-                print(f"Executing: {' '.join(command)}")
+                self.logger.debug(f"Executing command: {' '.join(command)}")
             subprocess.run(command, check=True)
-        except subprocess.CalledProcessError as e:
-            print(f"Error: {e}")
+            self.logger.info(f"Successfully executed command: {' '.join(command)}")
+        except subprocess.CalledProcessError as ex:
+            self.logger.error(f"Command failed: {' '.join(command)}")
+            raise ex
 
 class DeployOperation(DeploymentOperation):
-    """Handles deployment of the application."""
-
     def execute(self, config_path, env, secret):
-        print("Starting deployment...")
+        self.logger.info("Starting deployment")
         self.run_command([
             "ansible-playbook", config_path,
             f"--extra-vars=env={env} secret={secret}"
         ])
 
 class UpdateOperation(DeploymentOperation):
-    """Handles updating the application."""
-
     def execute(self, config_path, env, secret):
-        print("Starting update...")
+        self.logger.info("Starting update to LATEST image")
         self.run_command([
             "ansible-playbook", config_path,
             f"--extra-vars=env={env} secret={secret}"
         ])
 
 class RollbackOperation(DeploymentOperation):
-    """Handles rollback of the application."""
-
     def execute(self, config_path, env, secret):
-        print("Starting rollback...")
+        self.logger.info("Starting rollback to BASE image")
         self.run_command([
             "ansible-playbook", config_path,
             f"--extra-vars=env={env} secret={secret}"
