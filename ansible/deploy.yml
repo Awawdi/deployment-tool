@@ -1,5 +1,5 @@
 - name: Deploy the FastAPI app
-  hosts: localhost
+  hosts: "{{ env }}"
   tasks:
     - name: Stop and remove any existing container if running
       ansible.builtin.command: docker rm -f fastapi-app
