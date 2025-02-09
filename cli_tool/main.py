@@ -58,7 +58,7 @@ class DeploymentCLI:
             raise Exception(f"Error retrieving secrets: [{ex}]. Client ID: {self.HCP_CLIENT_ID}")
 
     @staticmethod
-    def get_credentials(data:dict,username_key="MONGODB_USERNAME",password_key="MONGODB_PASS"):
+    def get_credentials(data:dict,username_key="USERNAME",password_key="PASS"):
         credentials = {'username': None, 'password': None}
 
         for secret in data.get('secrets', []):
