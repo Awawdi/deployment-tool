@@ -1,21 +1,35 @@
-from abc import ABC, abstractmethod
+from abc import ABC
+from enum import Enum
 import subprocess
 import logging
+
+class Operations(Enum):
+    DEPLOY = "deploy"
+    UPDATE = "update"
+    ROLLBACK = "rollback"
+
 
 class DeploymentOperation(ABC):
     """
     Abstract class for deployment operations.
     """
-    def __init__(self, verbose=False):
+    def __init__(self, operation_name: Operations, description: str, verbose=False):
+        self.operation_name = operation_name
+        self.description = description
         self.verbose = verbose
         self.logger = logging.getLogger()
 
-    @abstractmethod
     def execute(self, config_path, env, secret):
         """
-        Each operation will implement the execute method differently.
+        Shared execution for all operations.
+        Each subclass will define a specific operation name.
         """
-        pass
+        self.logger.info(f"Starting {self.operation_name.value}: {self.description}")
+
+        self.run_command([
+            "ansible-playbook", config_path,
+            f"--extra-vars=env={env} secret={secret}"
+        ])
 
     def run_command(self, command):
         try:
@@ -28,25 +42,19 @@ class DeploymentOperation(ABC):
             raise ex
 
 class DeployOperation(DeploymentOperation):
-    def execute(self, config_path, env, secret):
-        self.logger.info("Starting deployment")
-        self.run_command([
-            "ansible-playbook", config_path,
-            f"--extra-vars=env={env} secret={secret}"
-        ])
+    def __init__(self, verbose=False):
+        super().__init__(operation_name=Operations.DEPLOY, 
+                         verbose=verbose, 
+                         description="Deploy the application")
 
 class UpdateOperation(DeploymentOperation):
-    def execute(self, config_path, env, secret):
-        self.logger.info("Starting update to LATEST image")
-        self.run_command([
-            "ansible-playbook", config_path,
-            f"--extra-vars=env={env} secret={secret}"
-        ])
+    def __init__(self, verbose=False):
+        super().__init__(operation_name=Operations.UPDATE, 
+                         verbose=verbose, 
+                         description="Update to LATEST image")
 
 class RollbackOperation(DeploymentOperation):
-    def execute(self, config_path, env, secret):
-        self.logger.info("Starting rollback to BASE image")
-        self.run_command([
-            "ansible-playbook", config_path,
-            f"--extra-vars=env={env} secret={secret}"
-        ])
+    def __init__(self, verbose=False):
+        super().__init__(operation_name=Operations.ROLLBACK,  
+                         verbose=verbose, 
+                         description="Rollback to BASE image")
