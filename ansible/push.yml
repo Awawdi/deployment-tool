@@ -1,0 +1,14 @@
+- name: Push FastAPI Docker Image to DockerHub
+  hosts: "{{ env }}"
+  tasks:
+    - name: Authenticate with DockerHub
+      ansible.builtin.command: >
+        docker login -u {{ dockerhub_user }} -p {{ dockerhub_password }}
+
+    - name: Tag Docker image
+      ansible.builtin.command: >
+        docker tag fastapi-app:latest {{ dockerhub_user }}/fastapi-app:latest
+
+    - name: Push Docker image
+      ansible.builtin.command: >
+        docker push {{ dockerhub_user }}/fastapi-app:latest

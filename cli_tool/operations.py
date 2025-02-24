@@ -22,7 +22,6 @@ class DeploymentOperation(ABC):
     def execute(self, config_path, env, secret):
         """
         Shared execution for all operations.
-        Each subclass will define a specific operation name.
         """
         self.logger.info(f"Starting {self.operation_name.value}: {self.description}")
 
