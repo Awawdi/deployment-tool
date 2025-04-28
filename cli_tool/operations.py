@@ -26,7 +26,9 @@ class DeploymentOperation(ABC):
         self.logger.info(f"Starting {self.operation_name.value}: {self.description}")
 
         self.run_command([
-            "ansible-playbook", config_path,
+            "ansible-playbook",
+            "-i", "inventory.ini",
+            config_path,
             f"--extra-vars=env={env} secret={secret}"
         ])
 

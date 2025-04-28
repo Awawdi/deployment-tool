@@ -1,12 +1,19 @@
 - name: Update the FastAPI app
   hosts: "{{ env }}"
   tasks:
+    - name: Upload application files
+      ansible.builtin.copy:
+        src: ../app/
+        dest: /tmp/app/
+        mode: '0755'
+
     - name: Stop and remove the current container if running
       ansible.builtin.command: docker rm -f fastapi-app
       ignore_errors: yes
 
-    - name: Pull the "latest" Docker image
-      ansible.builtin.command: docker pull orsanaw/fastapi-app:latest
+    - name: Build Docker image
+      ansible.builtin.command:
+        cmd: docker build --no-cache -t fastapi-app:latest -f /tmp/app/Dockerfile /tmp/app
 
     - name: Start the FastAPI container with the "latest" image
-      ansible.builtin.command: docker run -d --name fastapi-app -p 8000:8000 fastapi-app:latest
+      ansible.builtin.command: docker run -d --name fastapi-app -p 9000:9000 fastapi-app:latest

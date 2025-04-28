@@ -7,7 +7,7 @@ from cli_tool.vault_cloud_api import VaultAPI
 
 class DeploymentCLI:
     """
-    Command-line interface for deployment operations.
+    CLI interface for deployment operations.
     """
     HCP_CLIENT_ID = "cTpBXF0Bq52Mn1K5FWL9bY3cHrHDKk9P"
     ORGANIZATION_ID = "7e48578e-e4a2-443d-9cad-d61f13e0ad87"
@@ -24,8 +24,8 @@ class DeploymentCLI:
         self.parser.add_argument("--update", action="store_true", help="Update the application.")
         self.parser.add_argument("--rollback", action="store_true", help="Rollback the application.")
         self.parser.add_argument("--config", type=str, required=True, help="Path to the configuration file.")
-        self.parser.add_argument("--env", type=str,  required=True, choices=["development", "staging", "production"],
-                                 help="Deployment environment.")
+        self.parser.add_argument("--env", type=str,  required=True,
+                    choices=["localhost", "development", "staging", "production"],help="Deployment environment.")
         self.parser.add_argument("--verbose", action="store_true", default=False, help="Enable verbose output.")
         self.parser.add_argument("--log", default="app.log", type=str, help="Path to the log file.")
         self.parser.add_argument("--secret", type=str, help="Secret key or token.")

@@ -5,8 +5,5 @@
       ansible.builtin.command: docker rm -f fastapi-app
       ignore_errors: yes
 
-    - name: Pull the "base" Docker image
-      ansible.builtin.command: docker pull orsanaw/fastapi-app:base
-
     - name: Start the FastAPI container with the "base" image
-      ansible.builtin.command: docker run -d --name fastapi-app -p 8000:8000 fastapi-app:base
+      ansible.builtin.command: docker run -d --name fastapi-app -p 9000:9000 fastapi-app:base

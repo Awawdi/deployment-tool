@@ -14,6 +14,6 @@ WORKDIR /app
 COPY --from=builder /wheels /wheels
 RUN pip install --no-cache-dir /wheels/* && rm -rf /wheels
 COPY app.py /app/
-EXPOSE 8000
+EXPOSE 9000
 ENTRYPOINT ["uvicorn", "app:app"]
-CMD ["--host", "0.0.0.0", "--port", "8000"]
+CMD ["--host", "0.0.0.0", "--port", "9000"]

@@ -4,4 +4,4 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello From Latest Image"}
+    return {"message": "Hello From FastAPI LATEST image!"}
